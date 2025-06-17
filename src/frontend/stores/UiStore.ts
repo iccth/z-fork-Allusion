@@ -54,8 +54,8 @@ export interface IHotkeyMap {
 
 // https://blueprintjs.com/docs/#core/components/hotkeys.dialog
 export const defaultHotkeyMap: IHotkeyMap = {
-  toggleOutliner: '1',
-  toggleInspector: '2',
+  toggleOutliner: 'tab',
+  toggleInspector: 'backspace',
   replaceQuery: 'r',
   toggleSettings: 's',
   toggleHelpCenter: 'h',
