@@ -122,6 +122,17 @@ class UiStore {
 
   private readonly rootStore: RootStore;
 
+  // 记忆最近使用的标签，第1步：存储最近使用的标签ID
+  recentTags: string[] = []; 
+  addRecentTag(tagId: string) {
+    const idx = this.recentTags.indexOf(tagId);
+    if (idx !== -1) this.recentTags.splice(idx, 1);
+    this.recentTags.unshift(tagId);
+    if (this.recentTags.length > 10) this.recentTags.pop();
+    // localStorage 持久化
+    localStorage.setItem('recentTags', JSON.stringify(this.recentTags));
+  }
+
   // Theme
   @observable theme: 'light' | 'dark' = 'dark';
 
@@ -177,6 +188,16 @@ class UiStore {
   constructor(rootStore: RootStore) {
     this.rootStore = rootStore;
     makeObservable(this);
+
+    // 记忆最近使用的标签，第1.1步：从持久化存储中读取最近使用的标签
+    const stored = localStorage.getItem('recentTags');
+    if (stored) {
+      try {
+        this.recentTags = JSON.parse(stored);
+      } catch {
+        this.recentTags = [];
+      }
+    }
   }
 
   /////////////////// UI Actions ///////////////////

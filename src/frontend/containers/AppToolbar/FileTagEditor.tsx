@@ -45,7 +45,15 @@ const FileTagEditor = observer(() => {
 export default FileTagEditor;
 
 const TagEditor = () => {
-  const { uiStore } = useStore();
+  // const { uiStore } = useStore();
+  
+  // 记忆最近使用的标签，第3步：修改 useStore()，在标签编辑器顶部显示最近标签
+  const { uiStore, tagStore } = useStore();
+  // 记忆最近使用的标签，第3.1步：获取最近使用的标签对象
+  const recentTags = uiStore.recentTags
+    .map((id) => tagStore.getById(id))
+    .filter(Boolean);
+
   const [inputText, setInputText] = useState('');
 
   const counter = useComputed(() => {
@@ -133,36 +141,61 @@ const TagEditor = () => {
     [handleGridFocus],
   );
 
+
   return (
-    <div
-      ref={panelRef}
-      id="tag-editor"
-      style={{ height: storedHeight ?? undefined }}
-      role="combobox"
-      aria-haspopup="grid"
-      aria-expanded="true"
-      aria-owns={POPUP_ID}
-    >
-      <input
-        type="text"
-        spellCheck={false}
-        value={inputText}
-        aria-autocomplete="list"
-        onChange={handleInput}
-        onKeyDown={handleKeyDown}
-        className="input"
-        aria-controls={POPUP_ID}
-        aria-activedescendant={activeDescendant}
-        ref={inputRef}
-      />
-      <MatchingTagsList
-        ref={gridRef}
-        inputText={inputText}
-        counter={counter}
-        resetTextBox={resetTextBox}
-      />
-      <TagSummary counter={counter} removeTag={removeTag} />
-    </div>
+    // 记忆最近使用的标签，第3.2步: 添加UI组件来显示最近使用的标签
+    <>
+      {/* 新增：最近使用标签 */}
+      {recentTags.length > 0 && (
+        <div className="recent-tags">
+          <span>最近使用：</span>
+          {recentTags.map((tag) => (
+            <Tag
+              key={tag.id}
+              text={tag.name}
+              color={tag.viewColor}
+              onClick={() => {
+                for (const f of uiStore.fileSelection) {
+                  f.addTag(tag);
+                }
+                uiStore.addRecentTag(tag.id);
+              }}
+            />
+          ))}
+        </div>
+      )}
+
+      <div
+        ref={panelRef}
+        id="tag-editor"
+        style={{ height: storedHeight ?? undefined }}
+        role="combobox"
+        aria-haspopup="grid"
+        aria-expanded="true"
+        aria-owns={POPUP_ID}
+      >
+        <input
+          type="text"
+          spellCheck={false}
+          value={inputText}
+          aria-autocomplete="list"
+          onChange={handleInput}
+          onKeyDown={handleKeyDown}
+          className="input"
+          aria-controls={POPUP_ID}
+          aria-activedescendant={activeDescendant}
+          ref={inputRef}
+        />
+        <MatchingTagsList
+          ref={gridRef}
+          inputText={inputText}
+          counter={counter}
+          resetTextBox={resetTextBox}
+        />
+        <TagSummary counter={counter} removeTag={removeTag} />
+      </div>
+    
+    </>
   );
 };
 
@@ -196,6 +229,12 @@ const MatchingTagsList = observer(
       const operation = isSelected
         ? (f: ClientFile) => f.removeTag(tag)
         : (f: ClientFile) => f.addTag(tag);
+        
+      // 记忆最近使用的标签，第2.1步：在添加标签时调用方法存储该标签到最近使用队列
+      if (!isSelected) {
+        uiStore.addRecentTag(tag.id);
+      }
+      
       uiStore.fileSelection.forEach(operation);
       resetTextBox();
     });
@@ -239,6 +278,8 @@ const CreateOption = ({ inputText, hasMatches, resetTextBox }: CreateOptionProps
       for (const f of uiStore.fileSelection) {
         f.addTag(newTag);
       }
+      // 记忆最近使用的标签，第2步：在创建标签时调用方法存储该标签最近使用队列
+      uiStore.addRecentTag(newTag.id);
     });
     resetTextBox();
     // eslint-disable-next-line react-hooks/exhaustive-deps
