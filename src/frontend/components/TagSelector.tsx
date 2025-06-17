@@ -220,19 +220,48 @@ const SuggestedTagsList = observer(
     ref: ForwardedRef<HTMLDivElement>,
   ) {
     const { id, query, selection, toggleSelection, resetTextBox, renderCreateOption } = props;
-    const { tagStore } = useStore();
+    
+    // const { tagStore } = useStore();
+    const { tagStore, uiStore } = useStore();
 
+    // const suggestions = useMemo(
+    //   () =>
+    //     computed(() => {
+    //       if (query.length === 0) {
+    //         return tagStore.tagList;
+    //       } else {
+    //         const textLower = query.toLowerCase();
+    //         return tagStore.tagList.filter((t) => t.name.toLowerCase().includes(textLower));
+    //       }
+    //     }),
+    //   [query, tagStore],
+    // ).get();
+
+    
+    // 记忆并添加最近使用的标签，第1.1步：右侧栏标签输入框修改标签列表排序，改为最近使用的标签优先排序（上方为原始代码）
     const suggestions = useMemo(
       () =>
         computed(() => {
+          let list: ClientTag[];
           if (query.length === 0) {
-            return tagStore.tagList;
+            list = tagStore.tagList.slice();
           } else {
             const textLower = query.toLowerCase();
-            return tagStore.tagList.filter((t) => t.name.toLowerCase().includes(textLower));
+            list = tagStore.tagList.filter((t) => t.name.toLowerCase().includes(textLower));
           }
+          // recentTags 排序
+          const recentIds = uiStore.recentTags;
+          list.sort((a, b) => {
+            const ia = recentIds.indexOf(a.id);
+            const ib = recentIds.indexOf(b.id);
+            if (ia === -1 && ib === -1) return 0;
+            if (ia === -1) return 1;
+            if (ib === -1) return -1;
+            return ia - ib;
+          });
+          return list;
         }),
-      [query, tagStore],
+      [query, tagStore, uiStore.recentTags],
     ).get();
 
     return (
