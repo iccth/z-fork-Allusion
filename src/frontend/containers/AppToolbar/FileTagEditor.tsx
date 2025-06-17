@@ -46,13 +46,13 @@ export default FileTagEditor;
 
 const TagEditor = () => {
   // const { uiStore } = useStore();
-  
+
   // 记忆最近使用的标签，第3步：修改 useStore()，在标签编辑器顶部显示最近标签
   const { uiStore, tagStore } = useStore();
   // 记忆最近使用的标签，第3.1步：获取最近使用的标签对象
   const recentTags = uiStore.recentTags
-    .map((id) => tagStore.getById(id))
-    .filter(Boolean);
+    .map((id) => tagStore.get(id))
+    .filter((tag): tag is ClientTag => !!tag); // 类型守卫，确保 recentTags 是 ClientTag[]
 
   const [inputText, setInputText] = useState('');
 
@@ -141,7 +141,6 @@ const TagEditor = () => {
     [handleGridFocus],
   );
 
-
   return (
     // 记忆最近使用的标签，第3.2步: 添加UI组件来显示最近使用的标签
     <>
@@ -194,7 +193,6 @@ const TagEditor = () => {
         />
         <TagSummary counter={counter} removeTag={removeTag} />
       </div>
-    
     </>
   );
 };
@@ -229,12 +227,12 @@ const MatchingTagsList = observer(
       const operation = isSelected
         ? (f: ClientFile) => f.removeTag(tag)
         : (f: ClientFile) => f.addTag(tag);
-        
+
       // 记忆最近使用的标签，第2.1步：在添加标签时调用方法存储该标签到最近使用队列
       if (!isSelected) {
         uiStore.addRecentTag(tag.id);
       }
-      
+
       uiStore.fileSelection.forEach(operation);
       resetTextBox();
     });

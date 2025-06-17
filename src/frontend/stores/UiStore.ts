@@ -123,12 +123,16 @@ class UiStore {
   private readonly rootStore: RootStore;
 
   // 记忆最近使用的标签，第1步：存储最近使用的标签ID
-  recentTags: string[] = []; 
+  recentTags: string[] = [];
   addRecentTag(tagId: string) {
     const idx = this.recentTags.indexOf(tagId);
-    if (idx !== -1) this.recentTags.splice(idx, 1);
+    if (idx !== -1) {
+      this.recentTags.splice(idx, 1);
+    }
     this.recentTags.unshift(tagId);
-    if (this.recentTags.length > 10) this.recentTags.pop();
+    if (this.recentTags.length > 10) {
+      this.recentTags.pop();
+    }
     // localStorage 持久化
     localStorage.setItem('recentTags', JSON.stringify(this.recentTags));
   }
