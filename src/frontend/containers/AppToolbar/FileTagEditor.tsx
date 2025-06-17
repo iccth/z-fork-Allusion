@@ -45,9 +45,7 @@ const FileTagEditor = observer(() => {
 export default FileTagEditor;
 
 const TagEditor = () => {
-  // const { uiStore } = useStore();
-
-  // 记忆最近使用的标签，第3步：修改 useStore()，在标签编辑器顶部显示最近标签
+  // 记忆最近使用的标签，第3步：修改 useStore() 存储
   const { uiStore, tagStore } = useStore();
   // 记忆最近使用的标签，第3.1步：获取最近使用的标签对象
   const recentTags = uiStore.recentTags
@@ -142,58 +140,36 @@ const TagEditor = () => {
   );
 
   return (
-    // 记忆最近使用的标签，第3.2步: 添加UI组件来显示最近使用的标签
-    <>
-      {/* 新增：最近使用标签 */}
-      {recentTags.length > 0 && (
-        <div className="recent-tags">
-          <span>最近使用：</span>
-          {recentTags.map((tag) => (
-            <Tag
-              key={tag.id}
-              text={tag.name}
-              color={tag.viewColor}
-              onClick={() => {
-                for (const f of uiStore.fileSelection) {
-                  f.addTag(tag);
-                }
-                uiStore.addRecentTag(tag.id);
-              }}
-            />
-          ))}
-        </div>
-      )}
-
-      <div
-        ref={panelRef}
-        id="tag-editor"
-        style={{ height: storedHeight ?? undefined }}
-        role="combobox"
-        aria-haspopup="grid"
-        aria-expanded="true"
-        aria-owns={POPUP_ID}
-      >
-        <input
-          type="text"
-          spellCheck={false}
-          value={inputText}
-          aria-autocomplete="list"
-          onChange={handleInput}
-          onKeyDown={handleKeyDown}
-          className="input"
-          aria-controls={POPUP_ID}
-          aria-activedescendant={activeDescendant}
-          ref={inputRef}
-        />
-        <MatchingTagsList
-          ref={gridRef}
-          inputText={inputText}
-          counter={counter}
-          resetTextBox={resetTextBox}
-        />
-        <TagSummary counter={counter} removeTag={removeTag} />
-      </div>
-    </>
+    <div
+      ref={panelRef}
+      id="tag-editor"
+      style={{ height: storedHeight ?? undefined }}
+      role="combobox"
+      aria-haspopup="grid"
+      aria-expanded="true"
+      aria-owns={POPUP_ID}
+    >
+      <input
+        type="text"
+        spellCheck={false}
+        value={inputText}
+        aria-autocomplete="list"
+        onChange={handleInput}
+        onKeyDown={handleKeyDown}
+        className="input"
+        aria-controls={POPUP_ID}
+        aria-activedescendant={activeDescendant}
+        ref={inputRef}
+      />
+      <MatchingTagsList
+        ref={gridRef}
+        inputText={inputText}
+        counter={counter}
+        resetTextBox={resetTextBox}
+      />
+      <TagSummary counter={counter} removeTag={removeTag} />
+    </div>
+    // </>
   );
 };
 
@@ -210,20 +186,7 @@ const MatchingTagsList = observer(
   ) {
     const { tagStore, uiStore } = useStore();
 
-    // const matches = useMemo(
-    //   () =>
-    //     computed(() => {
-    //       if (inputText.length === 0) {
-    //         return tagStore.tagList;
-    //       } else {
-    //         const textLower = inputText.toLowerCase();
-    //         return tagStore.tagList.filter((t) => t.name.toLowerCase().includes(textLower));
-    //       }
-    //     }),
-    //   [inputText, tagStore],
-    // ).get();
-
-    // 记忆并添加最近使用的标签，第1步：标签编辑器修改标签列表排序，改为最近使用的标签优先排序（上方注释为原始代码）
+    // 记忆最近使用的标签，第4步：标签编辑器修改标签列表排序，改为最近使用的标签优先排序（上方注释为原始代码）
     const matches = useMemo(
       () =>
         computed(() => {

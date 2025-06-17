@@ -220,25 +220,11 @@ const SuggestedTagsList = observer(
     ref: ForwardedRef<HTMLDivElement>,
   ) {
     const { id, query, selection, toggleSelection, resetTextBox, renderCreateOption } = props;
-    
-    // const { tagStore } = useStore();
+
+    // 记忆最近使用的标签，第5步：右侧栏标签输入框修改 useStore() 存储
     const { tagStore, uiStore } = useStore();
 
-    // const suggestions = useMemo(
-    //   () =>
-    //     computed(() => {
-    //       if (query.length === 0) {
-    //         return tagStore.tagList;
-    //       } else {
-    //         const textLower = query.toLowerCase();
-    //         return tagStore.tagList.filter((t) => t.name.toLowerCase().includes(textLower));
-    //       }
-    //     }),
-    //   [query, tagStore],
-    // ).get();
-
-    
-    // 记忆并添加最近使用的标签，第1.1步：右侧栏标签输入框修改标签列表排序，改为最近使用的标签优先排序（上方为原始代码）
+    // 记忆最近使用的标签，第5.1步：右侧栏标签输入框修改标签列表排序，改为最近使用的标签优先排序（上方为原始代码）
     const suggestions = useMemo(
       () =>
         computed(() => {

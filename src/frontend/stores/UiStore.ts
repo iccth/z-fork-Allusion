@@ -130,7 +130,7 @@ class UiStore {
       this.recentTags.splice(idx, 1);
     }
     this.recentTags.unshift(tagId);
-    if (this.recentTags.length > 10) {
+    if (this.recentTags.length > 15) {
       this.recentTags.pop();
     }
     // localStorage 持久化
