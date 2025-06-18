@@ -21,8 +21,6 @@ const WindowsTitlebar = () => {
 
   return (
     <div id="window-titlebar" className={isFocused ? undefined : 'inactive'}>
-      <div id="window-resize-area" />
-
       <WindowTitlebar />
 
       {!IS_MAC && <WindowSystemButtons />}
